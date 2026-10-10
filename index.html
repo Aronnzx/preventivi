@@ -920,7 +920,7 @@ async function buildPdf(p,bgData){
   const C=cfg(),W=210,M=18,TOP=50,BOT=267;
   const NAVY=[42,51,121],INK=[23,28,61],MUT=[95,101,132],LINE=[200,204,222];
   const t=tot(p),totMode=p.modo==="totale",drawn=new Set();
-  const bg=()=>{const pn=doc.getCurrentPageInfo().pageNumber;if(!drawn.has(pn)){drawn.add(pn);if(bgData)doc.addImage(bgData,"JPEG",0,0,210,297,"carta","FAST")}};
+  const bg=()=>{const pn=doc.getCurrentPageInfo().pageNumber;if(!drawn.has(pn)){drawn.add(pn);if(bgData)doc.addImage(bgData,"JPEG",0,0,210,297,"carta","FAST");doc.setFont("helvetica","normal");doc.setFontSize(12.5);doc.setTextColor(40,42,98);doc.text("www.argesedecorazioni.it",W/2,292.6,{align:"center"})}};
   const newPage=()=>{doc.addPage();bg();return TOP};
   bg();let y=TOP+2;
   // titolo
@@ -963,10 +963,6 @@ async function buildPdf(p,bgData){
   // note e condizioni
   const para=(lab,txt)=>{if(!txt||!txt.trim())return;doc.setFontSize(9);const ls=doc.splitTextToSize(txt.trim(),W-2*M);if(y+ls.length*4.3+8>BOT)y=newPage()+4;doc.setFont("helvetica","bold");doc.setFontSize(7.5);doc.setTextColor(...NAVY);doc.text(lab,M,y);y+=4.6;doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(...INK);doc.text(ls,M,y);y+=ls.length*4.3+5};
   para("NOTE",p.note);para("CONDIZIONI",p.condizioni);
-  // firme
-  if(y+18>BOT)y=newPage()+8;y+=4;const sw=(W-2*M-20)/2;
-  doc.setDrawColor(...MUT);doc.setLineWidth(.25);doc.line(M,y+8,M+sw,y+8);doc.line(W-M-sw,y+8,W-M,y+8);
-  doc.setFontSize(8);doc.setTextColor(...MUT);doc.text(C.azienda.nome,M,y+12.5);doc.text("Per accettazione (data e firma del cliente)",W-M-sw,y+12.5);
   const n=doc.getNumberOfPages();if(n>1)for(let i=1;i<=n;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(...MUT);doc.text("Preventivo "+p.numero+" · pag. "+i+"/"+n,W-M,BOT+4,{align:"right"})}
   return {blob:doc.output("blob"),pages:n};
 }
