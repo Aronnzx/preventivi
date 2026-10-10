@@ -736,6 +736,7 @@ const S={view:"preventivi",q:"",qc:"",filtro:"tutti",clienti:[],preventivi:[],co
 const cfg=()=>{const c=S.config||{};return {...clone(DEFAULT_CONFIG),...c,azienda:{...DEFAULT_CONFIG.azienda,...(c.azienda||{})},listino:c.listino||clone(DEFAULT_CONFIG.listino),modelli:c.modelli||clone(DEFAULT_CONFIG.modelli),noteRapide:c.noteRapide||clone(DEFAULT_CONFIG.noteRapide),acconto:c.acconto??DEFAULT_CONFIG.acconto}};
 
 /* ---------- archivio: online (db) o su questo dispositivo ---------- */
+const APP_VERSION="10 ott 2026 · 05:00";
 const IS_PWA=document.documentElement.dataset.pwa==="1";
 const IS_STANDALONE=(()=>{try{return window.navigator.standalone===true||matchMedia("(display-mode: standalone)").matches}catch(e){return false}})();
 const LKEY="argese_prev_local_v1",DKEY="argese_prev_draft_v1";
@@ -898,6 +899,7 @@ function renderListino(m){
       <p class="muted" style="margin:0;font-size:14px">Clienti, preventivi e listino sono salvati su questo telefono. Fai un backup ogni tanto e mandalo a te stesso su WhatsApp o salvalo in File. Con <b>Importa</b> puoi anche passare il listino a un altro telefono.</p>
       <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="exportBk">Esporta backup</button><label class="btn" style="position:relative">Importa backup<input id="bkIn" type="file" accept=".json,application/json" style="position:absolute;inset:0;opacity:0"></label></div>
       <span class="muted num" style="font-size:13px">${S.preventivi.length} preventivi · ${S.clienti.length} clienti${lsGet("argese_last_bk")?" · ultimo backup "+new Date(lsGet("argese_last_bk")).toLocaleDateString("it-IT"):" · nessun backup ancora"}</span></div>`:""}
+    <p class="muted" style="text-align:center;font-size:12.5px;margin:0">Versione dell'app: ${APP_VERSION}</p>
     ${IS_STANDALONE?"":`<div class="card home-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M10.5 18.5h3"/><path d="M12 6v6M9 9l3-3 3 3"/></svg>
       <div><b>Mettila nella schermata Home</b>${IS_PWA?`<ol><li><b>iPhone:</b> in Safari tocca <b>Condividi</b> → <b>Aggiungi alla schermata Home</b>.</li><li><b>Android:</b> in Chrome tocca <b>⋮</b> → <b>Aggiungi a schermata Home</b>.</li></ol>`:`<ol><li>Apri questa pagina in <b>Safari</b> (con l'accesso a claude.ai fatto).</li><li>Tocca <b>Condividi</b> in basso.</li><li>Scegli <b>Aggiungi alla schermata Home</b> e chiamala “Preventivi”.</li></ol>`}</div></div>`}
   </div>`;
@@ -1283,7 +1285,7 @@ $("#modal").addEventListener("click",e=>{if(e.target.id==="modal")hideModal()});
 $("#toast").addEventListener("click",e=>{if(e.target.classList.contains("tbtn")&&toastFn){const f=toastFn;toastFn=null;$("#toast").hidden=true;f()}});
 
 if(IS_PWA){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+  if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{try{r.update()}catch(e){}}).catch(()=>{}))}
 render();
 Store.init().catch(err=>{console.error(err);Store.mode="local";S.ready=true;render()});
 </script>
