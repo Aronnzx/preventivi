@@ -772,6 +772,13 @@ let toastT,toastFn=null;function toast(m,act){const t=$("#toast");t.innerHTML=""
 
 const STATI=[["bozza","Bozza"],["inviato","Inviato"],["accettato","Accettato"],["rifiutato","Rifiutato"]];
 const UM=["mq","ml","cad","a corpo","ore"];
+const NUOVI_LAVORI=[
+  {id:"int",nome:"Rifacimento parte di intonaci",descr:"Demolizione dell'intonaco ammalorato e rifacimento delle parti con intonaco a base calce, pronto per la finitura",um:"mq",prezzo:35},
+  {id:"cgp",nome:"Parete divisoria in cartongesso",descr:"Parete in cartongesso su struttura metallica, doppia lastra per lato, con isolante interno, stuccatura dei giunti pronta per la pittura",um:"mq",prezzo:45},
+  {id:"cgc",nome:"Contropareti in cartongesso",descr:"Controparete in cartongesso su struttura metallica, con stuccatura dei giunti pronta per la pittura",um:"mq",prezzo:35},
+  {id:"cgs",nome:"Controsoffitto in cartongesso",descr:"Controsoffitto in cartongesso su struttura metallica pendinata, con stuccatura dei giunti pronto per la pittura",um:"mq",prezzo:40},
+  {id:"cgv",nome:"Velette in cartongesso",descr:"Velette e ribassamenti in cartongesso su struttura metallica, con paraspigoli e stuccatura",um:"ml",prezzo:45}
+];
 const DEFAULT_CONFIG={
   azienda:{nome:"Argese Decorazioni"},firma:"Argese Decorazioni",sigla:"",ivaDefault:22,validita:30,acconto:30,
   noteRapide:["Colori a scelta del cliente","Spostamento mobili a cura del cliente","Ponteggi esclusi","Lavori eseguibili con casa abitata","Smaltimento materiali compreso"],
@@ -789,16 +796,17 @@ const DEFAULT_CONFIG={
     {id:"sma",nome:"Smaltatura porte / termosifoni",descr:"Carteggiatura, fondo e smalto",um:"cad",prezzo:60},
     {id:"dec",nome:"Effetto decorativo",descr:"Finitura decorativa o materica a scelta del cliente",um:"mq",prezzo:30},
     {id:"est",nome:"Tinteggiatura esterni",descr:"Pittura silossanica per esterni, due mani",um:"mq",prezzo:16},
-    {id:"pul",nome:"Pulizia finale e smaltimento",descr:"Pulizia del cantiere e smaltimento dei materiali",um:"a corpo",prezzo:120}
+    {id:"pul",nome:"Pulizia finale e smaltimento",descr:"Pulizia del cantiere e smaltimento dei materiali",um:"a corpo",prezzo:120},
+    ...NUOVI_LAVORI
   ]
 };
 
 /* ---------- stato ---------- */
 const S={view:"preventivi",q:"",qc:"",filtro:"tutti",clienti:[],preventivi:[],config:null,ready:false,ed:null,dirty:false,cfgDraft:null,share:null};
-const cfg=()=>{const c=S.config||{};return {...clone(DEFAULT_CONFIG),...c,azienda:{...DEFAULT_CONFIG.azienda,...(c.azienda||{})},listino:c.listino||clone(DEFAULT_CONFIG.listino),modelli:c.modelli||clone(DEFAULT_CONFIG.modelli),noteRapide:c.noteRapide||clone(DEFAULT_CONFIG.noteRapide),acconto:c.acconto??DEFAULT_CONFIG.acconto}};
+const cfg=()=>{const c=S.config||{};return {...clone(DEFAULT_CONFIG),...c,azienda:{...DEFAULT_CONFIG.azienda,...(c.azienda||{})},listino:c.listino?[...c.listino,...NUOVI_LAVORI.filter(n=>!(c.nuoviVisti||[]).includes(n.id)&&!c.listino.some(l=>l.id===n.id)).map(clone)]:clone(DEFAULT_CONFIG.listino),nuoviVisti:NUOVI_LAVORI.map(n=>n.id),modelli:c.modelli||clone(DEFAULT_CONFIG.modelli),noteRapide:c.noteRapide||clone(DEFAULT_CONFIG.noteRapide),acconto:c.acconto??DEFAULT_CONFIG.acconto}};
 
 /* ---------- archivio: online (db) o su questo dispositivo ---------- */
-const APP_VERSION="10 ott 2026 · 16:20";
+const APP_VERSION="15 ott 2026 · 09:05";
 const IS_PWA=document.documentElement.dataset.pwa==="1";
 const IS_STANDALONE=(()=>{try{return window.navigator.standalone===true||matchMedia("(display-mode: standalone)").matches}catch(e){return false}})();
 const LKEY="argese_prev_local_v1",DKEY="argese_prev_draft_v1";
